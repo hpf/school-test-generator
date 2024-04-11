@@ -4,21 +4,24 @@ from reportlab.lib.pagesizes import A4
 import datetime
 
 # 生成混合运算口算题:乘除加减混合运行，乘除在九九表内
-def generate_question():
+def generate_question(tag=False):
+  
     # 随机选择口算题模板
-    templates=['a x b + c', 'a x b - c', 'a x (b - c)', 'a x (b + c)', 'a ÷ b + c', 'a ÷ b - c', 'a ÷ (b + c)', 'a ÷ (b - c)']
+    templates=['a x b + c', 'a x b - c','a ÷ b + c','a ÷ b - c','c-a x b','c-a ÷ b']
+    
+    if tag:
+        templates.append('a x (b + c)')
+        templates.append('a x (b - c)')
+        templates.append('a ÷ (b - c)')
+        templates.append('a ÷ (b + c)')
 
     template = random.choice(templates)
-    # 生成乘数、被乘数、加数、减数
-    a = random.randint(1, 9)
-    b = random.randint(1, 9)
-    c = random.randint(1, 9)
-    d = random.randint(1, 9)
     # 根据模板生成口算题
+
     if template == 'a x b + c':
         a=random.randint(1, 9)
         b=random.randint(1, 9)
-        c=100-a*b
+        c=random.randint(1,100-a*b)
         result = a * b + c
         question = f'{a} x {b} + {c}'
         
@@ -33,7 +36,7 @@ def generate_question():
         a=random.randint(1, 9)
         b=random.randint(1, 100)
         c=random.randint(1, 99)
-        while b - c > 9:
+        while b - c > 9 and b-c<=0:
             b=random.randint(1, 100)
             c=random.randint(1, 99)
         result = a * (b - c)
@@ -84,6 +87,21 @@ def generate_question():
         result = a / b + c
         question = f'{a} ÷ ({b} - {c})'    
     
+    elif template == 'c-a x b':
+        a=random.randint(1, 9)
+        b=random.randint(1, 9)
+        c=random.randint(a*b, 100)
+        result = c-a*b
+        question = f'{c} - {a} x {b}'
+
+    elif template == 'c-a ÷ b':
+        b=random.randint(1, 9)
+        a=random.randint(1,9) * b
+        c=random.randint(a//b, 100)
+        result = a - b / c
+        question = f'{c} - {a} ÷ {b}'
+
+
     return question + ' = ', result
 
 #输出中间线
@@ -153,6 +171,7 @@ if __name__ == '__main__':
     n = int(input("请输入要生成的题目数量："))
     for i in range(n):
         question, result = generate_question()
-        quarz.append(question)
+        if(result>1 or result<101):
+            quarz.append(question)
     
     output_list_to_pdf(quarz)
